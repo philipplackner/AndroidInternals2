@@ -1,5 +1,6 @@
 package com.plcoding.androidinternals2
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,12 +12,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import com.plcoding.androidinternals2.ui.theme.AndroidInternals2Theme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if(intent != null) {
+            handleIntent(intent)
+        }
+
         setContent {
             AndroidInternals2Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -25,6 +34,26 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        lifecycleScope.launch {
+            delay(3000L)
+            if(intent.action == "com.plcoding.ACTION_GREET_ME") {
+                setResult(
+                    RESULT_OK,
+                    Intent().apply {
+                        putExtra("greeting", "Yo what's up?!")
+                    }
+                )
+                finish()
             }
         }
     }
